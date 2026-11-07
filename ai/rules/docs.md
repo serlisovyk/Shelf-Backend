@@ -8,7 +8,7 @@ API contract for clients is the generated OpenAPI document, not a doc.
   the code (parameters, response shapes, constants, the endpoint list) or another doc. The map names
   where to look.
 - **No history in current docs.** No task numbers, "since MY-…", measurements or check logs: they
-  belong to commits and Linear. A rule says what holds now; a decision says why. The one exception is
+  belong to commits, plans, reports and Linear. A rule says what holds now; a decision says why. The one exception is
   a short note on a part a later task will build (a _planned_ mark in the map, a temporary
   exception in a rule): it may name that task (`MY-<n>`), and the task that builds it deletes the
   note.

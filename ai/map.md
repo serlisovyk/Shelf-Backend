@@ -20,7 +20,8 @@ mark with what was built.
 - `.env.sample` — every environment variable with a description; `.env*` is git-ignored.
 - `README.md` — setup, scripts, the public API; `AGENTS.md` — the entry point for agents, `CLAUDE.md`
   points to it.
-- `ai/` — agent docs: this map, `rules/`, `decisions/`, `linear-task-template.md`.
+- `ai/` — agent docs: this map, `workflow.md`, `rules/`, `decisions/`, `prompts/`,
+  `linear-task-template.md`; `superpowers/plans/` and `superpowers/specs/` appear with the first plan.
 - `.claude/worktrees/` — one git worktree per task when tasks run in parallel; ignored by git.
 - _Planned:_ `docker-compose.yml` (Postgres for dev and tests), `drizzle.config.ts`, `Dockerfile`,
   `.dockerignore`, `.github/workflows/` (CI).

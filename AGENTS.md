@@ -29,6 +29,8 @@ to the project size: one API, one database, feature modules, no enterprise layer
   without an explicit request.
 - `ai/rules/definition-of-done.md`: the gate before a change is handed over; `ai/rules/docs.md`: one
   fact one home, size limits, no history in docs.
+- `ai/superpowers/` is the archive of past plans and specs: read only the plan or spec of the feature
+  you change.
 
 ## Decisions
 
@@ -41,16 +43,30 @@ Propose a new record, without being asked, when a decision meets the criteria in
 
 ## Workflow
 
-- Linear issues follow `ai/linear-task-template.md`; read the issue in full, its «Порядок» section
-  and its checklists included, before starting.
-- Task work happens on a branch of its own, never directly on `main`.
+`ai/workflow.md` is the end-to-end flow for a Linear task: orient → plan (+ spec when API behavior
+changes) → implement → docs → verify → Definition of Done → self-review → report → author approval →
+local merge into `main`.
+
+The parts that never bend:
+
+- Never commit task work directly on `main`: use a `my-<n>-<slug>` branch with an English slug, never
+  Linear's `gitBranchName`; one worktree per parallel task under `.claude/worktrees/`.
+- Write a **plan** for anything non-trivial, and a **spec** when observable API behavior changes,
+  under `ai/superpowers/`: one commit, before any code.
+- Nothing is merged and no issue is marked `Done` without the author's explicit approval.
+- Merges happen locally into `main` (rebase, then fast-forward), then `main` is pushed. No pull
+  requests, no pushed feature branches, and never a force-push of `main` (decision
+  `local-merge-without-pr`).
+- Never bypass the pre-commit hook (`--no-verify`): it runs lint-staged (ESLint and Prettier on the
+  staged files); fix what it reports.
 - Commits follow Conventional Commits in English (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`,
   `build:`, `ci:`, `chore:`): specific, never `update` or `changes`.
-- Never bypass the pre-commit hook (`--no-verify`): it runs lint-staged (ESLint and Prettier on the
-  staged files); fix what it reports. Never force-push `main`.
-- Nothing is merged and no issue is marked `Done` in Linear without the author's explicit approval.
 - A change of behavior comes with tests in the same change; a bug fix starts with a test that
   reproduces it.
+
+Prompts to start agent sessions live in `ai/prompts/` (index in `ai/prompts/README.md`):
+`orchestrator.md` runs several tasks from one session, `task.md` runs a single task. Linear issues
+follow `ai/linear-task-template.md`.
 
 ## Working Principles
 
@@ -68,7 +84,8 @@ Propose a new record, without being asked, when a decision meets the criteria in
 ## Project Defaults
 
 - Package manager and runtime: Bun (version pinned in `package.json`); `bun.lock` is the only
-  lockfile, never edited by hand. Install with `bun install`.
+  lockfile, never edited by hand. Install with `bun install --frozen-lockfile`; plain `bun install`
+  only when a dependency changes.
 - Stack: Bun, Elysia, TypeScript (strict), PostgreSQL with Drizzle ORM, `t` (TypeBox) schemas.
 - Sources: everything under `src/`; `src/index.ts` is the entry, `src/app.ts` assembles the app.
   `ai/map.md` shows where each part lives.
@@ -79,12 +96,12 @@ Propose a new record, without being asked, when a decision meets the criteria in
 ## Commands
 
 ```bash
-bun install            # install dependencies and the Git hooks
-bun run dev            # dev server with file watching
-bun run typecheck      # tsc --noEmit
-bun run lint           # ESLint (lint:fix to auto-fix)
-bun run format         # apply Prettier (format:check to verify only)
-bun test               # run the test suite
+bun install --frozen-lockfile   # install dependencies and the Git hooks
+bun run dev                     # dev server with file watching
+bun run typecheck               # tsc --noEmit
+bun run lint                    # ESLint (lint:fix to auto-fix)
+bun run format                  # apply Prettier (format:check to verify only)
+bun test                        # run the test suite
 ```
 
 ## Language
@@ -106,7 +123,25 @@ bun test
 
 - If formatting was changed, run `bun run format`; `bun run lint:fix` fixes the lint findings it can.
 - A change to a route, a schema, a service or an error is also called by hand against a running
-  server (`bun run dev`, then curl), the error cases included: a green test run does not prove an
+  server, the error cases included ("Manual API check" below): a green test run does not prove an
   endpoint works.
 - If a check cannot be run, report that clearly. Do not claim the project works, tests or formats
   correctly unless the command ran successfully.
+
+### Manual API check
+
+Every task runs its own server on its own port, never the author's server, database, `.env` or
+compose stack:
+
+```bash
+PORT=<port> bun run dev
+```
+
+Call the endpoints with curl, the happy path and the error cases, then stop the server. Once the
+database lands (MY-363), the server also gets its own throwaway Postgres container with its own name
+and host port, migrated before the check and stopped after it:
+
+```bash
+docker run -d --rm --name shelf-pg-my-<n> -e POSTGRES_USER=shelf -e POSTGRES_PASSWORD=shelf -e POSTGRES_DB=shelf -p <db-port>:5432 postgres:17-alpine
+docker stop shelf-pg-my-<n>
+```

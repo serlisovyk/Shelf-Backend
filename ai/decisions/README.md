@@ -45,6 +45,7 @@ with the record that replaced it.
 ### Project and process
 
 - [A separate repo for the backend](2026-11-07-separate-backend-repo.md)
+- [Merge locally into `main`, no pull requests; only `main` is pushed](2026-11-07-local-merge-without-pr.md)
 
 ### Stack
 

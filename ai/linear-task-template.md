@@ -63,6 +63,7 @@ What is deliberately excluded; adjacent work goes into separate issues, linked.
 
 Keep the relevant lines, delete the rest. Copy them into the issue as-is:
 
+- [ ] `ai/superpowers/` — план (+ спека, если меняется поведение API) одним коммитом до кода
 - [ ] Тесты: поведение покрыто, для данных пользователя — тест изоляции (чужая запись → 404)
 - [ ] Миграция drizzle-kit в репо, если изменилась схема БД
 - [ ] OpenAPI — схемы `response` и `detail` у новых и изменённых роутов
