@@ -95,3 +95,7 @@ The pre-commit hook runs ESLint and Prettier on staged files via Husky + lint-st
 ```text
 GET /health
 ```
+
+## 🧱 Architecture Notes
+
+Module layers, boundaries, validation, security, naming and testing rules live in [`ai/`](ai/): start with the [repo map](ai/map.md) and the [rules](ai/rules). Agents and contributors start from [`AGENTS.md`](AGENTS.md).
